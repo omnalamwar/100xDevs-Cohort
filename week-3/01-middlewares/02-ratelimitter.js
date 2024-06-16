@@ -16,6 +16,23 @@ setInterval(() => {
     numberOfRequestsForUser = {};
 }, 1000)
 
+app.use(function(req, res, next){
+  const user = req.headers["user-id"];
+
+  if(numberOfRequestsForUser[user]){
+    numberOfRequestsForUser[user] = numberOfRequestsForUser[user] + 1;
+    if(numberOfRequestsForUser[user] > 5)
+      res.status(404).json({"msg": "You are blocked as you are accessing faster"});
+    else{
+      next();
+    }
+  } else{
+    numberOfRequestsForUser[user] = 1;
+    next();
+  }
+  next();
+});
+
 app.get('/user', function(req, res) {
   res.status(200).json({ name: 'john' });
 });
